@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM node:20-alpine
 WORKDIR /scanner_praser
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
