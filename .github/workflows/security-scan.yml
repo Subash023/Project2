@@ -17,13 +17,12 @@ jobs:
     - name: Create Keyrings Directory
       run: sudo mkdir -p /etc/apt/keyrings
 
-    - name: Install Trivy
-      run: |
-        sudo apt-get install wget apt-transport-https gnupg lsb-release
-        wget -qO - https://github.io | sudo apt-key add -
-        echo deb https://github.io $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'node:14-alpine'
+        format: 'json'
+        output: 'report.json'
 
     - name: Run Trivy Scan
       run: trivy image --format json --output report.json my-app:${{ github.sha }}
