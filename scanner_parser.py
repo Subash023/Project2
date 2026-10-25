@@ -64,16 +64,21 @@ def main():
         opener = urllib.request.build_opener()
         opener.addheaders = [('ngrok-skip-browser-warning', 'true')]
 
-        # 2. Define a compliant handler function that the SDK expects
+        # 2. Define a compliant handler function that handles both dictionary and list headers
         def native_ngrok_handler(url, method, timeout, headers, data):
-            # Create the basic request object
             req = urllib.request.Request(url, data=data, method=method)
             
-            # Pass along the standard prometheus client SDK headers
-            for key, value in (headers or {}).items():
-                req.add_header(key, value)
+            # Safely parse headers whether the SDK sends them as a dict or a list of tuples
+            if headers:
+                if isinstance(headers, dict):
+                    header_iterable = headers.items()
+                else:
+                    header_iterable = headers  # It is already an iterable list/tuple structure
+
+                for key, value in header_iterable:
+                    req.add_header(key, value)
                 
-            # Execute using our custom opener containing the ngrok bypass line
+            # Execute using our custom opener
             with opener.open(req, timeout=timeout) as response:
                 return response.read()
 
