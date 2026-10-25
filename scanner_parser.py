@@ -58,7 +58,20 @@ def main():
     
     # Push to gateway under a specific grouping job identifier
     try:
-        push_to_gateway('https://derby-earthen-subwoofer.ngrok-free.dev/query', job='trivy_security_scan', registry=registry)
+        # Define a custom handler to bypass ngrok's interstitial warning screen
+        def ngrok_handler(url, method, timeout, headers, data):
+            if headers is None:
+                headers = {}
+            headers['ngrok-skip-browser-warning'] = 'true'
+            return requests.request(method, url, headers=headers, data=data, timeout=timeout)
+
+        # Base URL only + passing the custom handler
+        push_to_gateway(
+            'https://derby-earthen-subwoofer.ngrok-free.dev', 
+            job='trivy_security_scan', 
+            registry=registry,
+            handler=ngrok_handler
+        )
         print("Successfully pushed metrics to Prometheus Pushgateway.")
     except Exception as e:
         print(f"Failed to push metrics: {e}")
