@@ -2,4 +2,4 @@ scrape_configs:
   - job_name: 'pushgateway'
     honor_labels: true
     static_configs:
-      - targets: ['localhost:9091'] # Ensure this matches your Pushgateway host address
+      - targets: ['localhost:9090'] # Ensure this matches your Pushgateway host address
