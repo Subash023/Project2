@@ -58,7 +58,7 @@ def main():
     
     # Push to gateway under a specific grouping job identifier
     try:
-        push_to_gateway(gateway_url='https://derby-earthen-subwoofer.ngrok-free.dev/query', job='trivy_security_scan', registry=registry)
+        push_to_gateway('https://derby-earthen-subwoofer.ngrok-free.dev/query', job='trivy_security_scan', registry=registry)
         print("Successfully pushed metrics to Prometheus Pushgateway.")
     except Exception as e:
         print(f"Failed to push metrics: {e}")
