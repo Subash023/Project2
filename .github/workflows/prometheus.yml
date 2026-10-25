@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s        # collect metrics every 15 seconds
+  evaluation_interval: 15s    # evaluate alerting rules every 15 seconds
+
+scrape_configs:
+
+  # Prometheus scrapes its own internal metrics — always on.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+
+  # ---------------------------------------------------------------------------
+  # Project 1 — Flask Web API (port 8081)
+  # Uncomment after: cd projects/01-flask-web-api && docker compose up -d --build
+  # ---------------------------------------------------------------------------
+  - job_name: "flask-web-api"
+    static_configs:
+      - targets: ["flask-web-api:8081"]
+
+  # ---------------------------------------------------------------------------
+  # Project 2 — Job Processor (port 8082)
+  # Uncomment after: cd projects/02-job-processor && docker compose up -d --build
+  # ---------------------------------------------------------------------------
+  - job_name: "job-processor"
+    static_configs:
+      - targets: ["job-processor:8082"]
+
+  # ---------------------------------------------------------------------------
+  # Project 3 — Cache Service (port 8083)
+  # Uncomment after: cd projects/03-cache-service && docker compose up -d --build
+  # ---------------------------------------------------------------------------
+  - job_name: "cache-service"
+    static_configs:
+      - targets: ["cache-service:8083"]
