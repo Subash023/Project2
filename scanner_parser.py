@@ -58,19 +58,31 @@ def main():
     
     # Push to gateway under a specific grouping job identifier
     try:
-        # Define a custom handler to bypass ngrok's interstitial warning screen
-        def ngrok_handler(url, method, timeout, headers, data):
-            if headers is None:
-                headers = {}
-            headers['ngrok-skip-browser-warning'] = 'true'
-            return requests.request(method, url, headers=headers, data=data, timeout=timeout)
+        import urllib.request
 
-        # Base URL only + passing the custom handler
+        # 1. Create a custom opener that injects the required ngrok bypass header
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('ngrok-skip-browser-warning', 'true')]
+
+        # 2. Define a compliant handler function that the SDK expects
+        def native_ngrok_handler(url, method, timeout, headers, data):
+            # Create the basic request object
+            req = urllib.request.Request(url, data=data, method=method)
+            
+            # Pass along the standard prometheus client SDK headers
+            for key, value in (headers or {}).items():
+                req.add_header(key, value)
+                
+            # Execute using our custom opener containing the ngrok bypass line
+            with opener.open(req, timeout=timeout) as response:
+                return response.read()
+
+        # 3. Pass the valid handler to the SDK push function
         push_to_gateway(
-            'https://derby-earthen-subwoofer.ngrok-free.dev', 
+            'https://ngrok-free.dev', 
             job='trivy_security_scan', 
             registry=registry,
-            handler=ngrok_handler
+            handler=native_ngrok_handler
         )
         print("Successfully pushed metrics to Prometheus Pushgateway.")
     except Exception as e:
